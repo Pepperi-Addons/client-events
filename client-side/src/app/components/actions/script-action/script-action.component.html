@@ -1,7 +1,5 @@
 <div class="content">
     <label class="lblTitle">{{'Script' | translate }}</label>
     <ngx-monaco-editor class="my-code-editor" [options]="editorOptions" [(ngModel)]="action.ActionData.Code"></ngx-monaco-editor>
-    <button type="button" class="btn pepperi-button mat-button strong color-main md pull-right flip publish" [ngClass]="'disabled'" (click)="run()">{{'Scheduler_Publish' | translate}}</button>
-    <button type="button" class="btn pepperi-button mat-button weak system md pull-right flip publish" (click)="run()">{{'Scheduler_Test' | translate}}</button>
-    <button type="button" class="btn pepperi-button mat-button weak system md pull-right flip publish" (click)="run()">{{'Scheduler_RestoreCode' | translate}}</button>
+    <button type="button" class="btn pepperi-button mat-button strong color-main md pull-right flip publish" (click)="run()">{{'Run' | translate}}</button>
 </div>

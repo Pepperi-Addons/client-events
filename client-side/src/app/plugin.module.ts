@@ -31,6 +31,17 @@ import { ScriptActionComponent } from './components/actions/script-action/script
 
 const monacoConfig: NgxMonacoEditorConfig  = {
   baseUrl: EnvVariables.AssetsDomain + sessionStorage.getItem('webappDirectory') +'/assets', // configure base path for monaco editor
+  onMonacoLoad: async () => {
+
+    window.monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
+      noSyntaxValidation: false,
+      noSemanticValidation: false
+    })
+
+    window.monaco.languages.typescript.javascriptDefaults.addExtraLib(
+      await fetch('http://localhost:4400/assets/plugins/02b186b2-4b43-4765-962c-9e02231b5514/0.0.2/types.d.ts').then(res => res.text())
+    )
+  }
 };
 
 @NgModule({

@@ -77,4 +77,19 @@ export class AddonApiService
          return this.httpClient.post<any>(fullURL, body, options);
 
     }
+
+    clientApiCall(params) {
+        return new Promise((resolve, reject) => {
+            this.userService.httpPost('Service1.svc/v1/ClientApi/Execute', {
+              Request: JSON.stringify(params)
+            }, (res) => {
+              if (res.Success) {
+                resolve(JSON.parse(res.Value));
+              }
+              else {
+                reject();
+              }
+            });
+          });
+    }
 }
