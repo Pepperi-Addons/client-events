@@ -173,44 +173,34 @@ export class PepperiListContComponent implements OnInit {
   }
 
   topBarOnInit(compRef: ComponentRef<any>) {
-    this.translate.get(['AddonManager_All', 'AddonManager_Updates']).subscribe(translatedValues => {
-        const topTitle = this.apiEndpoint === 'all' ? 'AddonManager_All' : 'AddonManager_Updates';
+    const topRightButtons = [];
+    const topLeftButtons = [];
+    const dataView = this.service.getDataView();
 
-        const topbarTitle = '';
-        const topBarInstance = compRef.instance;
-        const topRightButtons = [];
-        const topLeftButtons = [];
+    this.listActions = this.getListActions();
+    this.topBarInputs = {
+      showSearch: false,
+      selectedList: '',
+      listActionsXDirection: 'after',
+      listActionsData: this.listActions,
+      leftButtons: topLeftButtons,
+      rightButtons: topRightButtons,
+      showTotals: false,
+      showListActions: false,
+      topbarTitle: dataView.Title || '',
+      standalone: true
+    };
 
-        this.listActions = this.getListActions();
-        this.topBarInputs = {
-          showSearch: false,
-          selectedList: '',
-          listActionsXDirection: 'after',
-          listActionsData: this.listActions,
-          leftButtons: topLeftButtons,
-          rightButtons: topRightButtons,
-          showTotals: false,
-          showListActions: false,
-          topbarTitle: translatedValues[topTitle],
-          standalone: true
-        };
-
-        this.topBarOutputs = {
-          actionClicked: event => this.onActionClicked(event),
-          jsonDateFilterChanged: event =>  this.onJsonDateFilterChanged(event),
-          searchStringChanged: event => this.searchChanged(event)
-        };
-    });
+    this.topBarOutputs = {
+      actionClicked: event => this.onActionClicked(event),
+      jsonDateFilterChanged: event =>  this.onJsonDateFilterChanged(event),
+      searchStringChanged: event => this.searchChanged(event)
+    };
 
   }
 
   getListActions(rowData = null): Array<ListActionsItem> {
-    let obj = undefined;
-    if (rowData) {
-      // todo get by UID once alon adds this
-      // obj = this.list.find(item => item.UUID === rowData.UID)
-      obj = this.list[0];
-    }
+    let obj = rowData ? this.list.find(item => item.UUID === rowData.UID) : undefined;
     return this.service.getActions().filter(action => action.Filter(obj)).map(action => {
       return new ListActionsItem(action.Key, action.Title, false);
     })
@@ -258,7 +248,8 @@ export class PepperiListContComponent implements OnInit {
 
     const pepperiListObj = this.pluginService.pepperiDataConverter.convertListData(rows);
     const uiControl = pepperiListObj.UIControl;
-    const l = pepperiListObj.Rows.map((row) => {
+    const l = pepperiListObj.Rows.map((row, i) => {
+      row.UID = this.list[i].UUID || row.UID;
       const osd = new ObjectSingleData(uiControl, row);
       osd.IsEditable = false;
       return osd;
@@ -274,10 +265,8 @@ export class PepperiListContComponent implements OnInit {
 
       const uid = selectData.rows[0];
       const rowData = this.pepperiListComp.componentRef.instance.getItemDataByID( uid );
-      // todo get by UID once alon adds this
-      // const obj = this.list.find(item => item.UUID === rowData.UID)
-      const obj = this.list[0];
-      this.service.getActions().find(action => action.Key === event.ApiName).Action(rowData);
+      const obj = rowData ? this.list.find(item => item.UUID === rowData.UID) : undefined;
+      this.service.getActions().find(action => action.Key === event.ApiName).Action(obj);
     }
   }
 

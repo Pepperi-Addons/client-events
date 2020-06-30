@@ -9,7 +9,9 @@ import jwt from 'jwt-decode';
 import { HttpClient } from '@angular/common/http';
 
 
-@Injectable()
+@Injectable({
+    providedIn: 'root'
+  })
 export class AddonApiService
 {
     isInDevMode = false
@@ -62,6 +64,17 @@ export class AddonApiService
              }
          };
          return this.httpClient.get<any>(fullURL, options);
+
+    }
+    
+    post(url: string, body: any) {
+        const fullURL = url.startsWith('http') ? url : this.papiBaseURL + url;
+         const options = { 
+             'headers': {
+                 'Authorization': 'Bearer ' + this.accessToken
+             }
+         };
+         return this.httpClient.post<any>(fullURL, body, options);
 
     }
 }

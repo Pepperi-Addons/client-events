@@ -38,14 +38,6 @@ export class PluginComponent implements OnInit {
 
     this.routeParams.queryParams.subscribe(params => {
       this.view = params['view'] || 'list';
-
-      if (this.view === 'list') {
-        this.loadList();
-      }
-      else if (this.view === 'form') {
-        const uuid = params['event_uuid'];
-        this.loadForm(uuid);
-      }
     })
   }
 
@@ -54,14 +46,6 @@ export class PluginComponent implements OnInit {
   }
 
   ngOnDestroy() {
-  }
-
-  loadList() {
-    
-  }
-
-  loadForm(uuid: string | undefined) {
-
   }
   
 }

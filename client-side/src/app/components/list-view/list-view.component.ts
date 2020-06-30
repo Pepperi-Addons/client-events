@@ -1,7 +1,9 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { PluginService } from 'src/app/plugin.service';
 import { AddonApiService } from 'src/app/addon-api.service';
-import { PepperiListService } from '../pepperi-list/pepperi-list.component';
+import { PepperiListService, PepperiListContComponent } from '../pepperi-list/pepperi-list.component';
+import { EventsService } from 'src/app/events.service';
+import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-list-view',
@@ -62,12 +64,32 @@ export class ListViewComponent implements OnInit {
     getActions: () => {
       return [
         {
+          Key: 'Edit',
+          Title: 'Edit',
+          Filter: (obj) => true,
+          Action: (obj) => { 
+            this.router.navigate([], {
+              queryParams: {
+                view: 'form',
+                uuid: obj.UUID,
+              },
+              queryParamsHandling: 'merge',
+              relativeTo: this.activatedRoute
+            })
+          }
+        },
+        {
           Key: 'Activate',
           Title: 'Activate',
           Filter: (obj) => { 
             return obj && !obj.Active 
           },
-          Action: (obj) => { console.log('activate') }
+          Action: (obj) => { 
+            obj.Active = true;
+            this.eventsService.saveEvent(obj).subscribe(res => {
+              this.reload()
+            });
+          }
         },
         {
           Key: 'De-Activate',
@@ -75,25 +97,58 @@ export class ListViewComponent implements OnInit {
           Filter: (obj) => { 
             return obj && obj.Active 
           },
-          Action: (obj) => { console.log('de-activate') }
-        }
+          Action: (obj) => { 
+            obj.Active = false;
+            this.eventsService.saveEvent(obj).subscribe(res => {
+              this.reload();
+            });
+          }
+        },
+        {
+          Key: 'Delete',
+          Title: 'Delete',
+          Filter: (obj) => true,
+          Action: (obj) => { 
+            obj.Hidden = true;
+            this.eventsService.saveEvent(obj).subscribe(res => {
+              this.reload();
+            });
+          }
+        },
       ]
     },
 
-    getList: async () => {
-      return new Promise((resolve, reject) => {
-        this.addonApiService.get(this.addonApiService.getAddonApiBaseURL() + '/client_events/events').subscribe(res => {
-          resolve(res.result);
-        })
-      })
+    getList: () => {
+      return this.eventsService.getEvents().toPromise();
     }
   }
 
+
+  @ViewChild('list', { static: false })
+  list: PepperiListContComponent
+
   constructor(
-    private addonApiService: AddonApiService
+    private eventsService: EventsService,
+    private router: Router,
+    private activatedRoute: ActivatedRoute,
   ) { }
 
   ngOnInit(): void {
+  }
+
+  reload() {
+    this.list.loadlist('');
+  }
+
+  add() {
+    this.router.navigate([], {
+      queryParams: {
+        view: 'form',
+        uuid: '',
+      },
+      queryParamsHandling: 'merge',
+      relativeTo: this.activatedRoute
+    })
   }
 
 }

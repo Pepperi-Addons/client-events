@@ -1,1 +1,43 @@
-<p>form-view works!</p>
+<div class="content">
+    <div class="rowHeader lg pepperi-border-bottom">
+        <h2 class="jobTitle">{{ event ? event.On.Key != '' : 'Scheduler_AddJobTitle' | translate}}</h2>
+        <button type="button" class="btn pepperi-button mat-button strong color-main md pull-right flip" (click)="save(false)">{{'Apply' | translate}}</button>
+        <button type="button" class="btn pepperi-button mat-button weak system md pull-right flip" (click)="save(true)">{{'Save' | translate}}</button>
+        <button type="button" class="btn pepperi-button mat-button weak system md pull-right flip" (click)="cancel()">{{'Cancel' | translate}}</button>
+    </div>
+    <mat-tab-group id="tabs">
+        <mat-tab label="{{'General' | translate}}">
+            <div class="mat-tab-cont">
+                <div class="">
+                    <div class="tabBody">
+                        <div class="field-container">
+                            <label>Hook: </label>
+                            <ngx-select-dropdown [(ngModel)]="event.On.Hook" [multiple]="false" [config]="selectOptions" [options]="['Before', 'After', 'Main']"></ngx-select-dropdown>
+                        </div>
+                        
+                        <div class="field-container">
+                            <label>Event: </label>
+                            <ngx-select-dropdown [(ngModel)]="event.On.Key" [multiple]="false" [config]="selectOptions" [options]="['TSAButton', 'HomeScreenButton']"></ngx-select-dropdown>
+                        </div>
+                        
+                        <div class="field-container">
+                            <mat-checkbox [(ngModel)]="event.Active" name="scheduled"></mat-checkbox>
+                            <label> {{ 'Active' | translate }} </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </mat-tab>
+        <mat-tab label="{{'Actions' | translate}}">
+            <div class="mat-tab-cont">
+                <div class="action-form" *ngIf="currentAction">
+                    <app-script-action [(action)]='event.Actions[0]'></app-script-action>
+                </div>
+                <div class="actions-list" *ngIf="!currentAction">
+                    <pep-list #actionsList [service]="actionListService"></pep-list>
+                </div>
+            </div>
+        </mat-tab>
+
+    </mat-tab-group>
+</div>

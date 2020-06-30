@@ -14,6 +14,8 @@ import { ignoreElements } from 'rxjs/operators';
 //@ts-ignore
 import {EnvVariables} from 'pepperi-environment-variables';
 
+import { MonacoEditorModule, NgxMonacoEditorConfig } from 'ngx-monaco-editor';
+
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { AddonApiService } from './addon-api.service';
 import { PepperiListContComponent } from './components/pepperi-list/pepperi-list.component';
@@ -23,6 +25,13 @@ import {EditDialogComponent } from './components/dialogs/edit-dialog/edit-dialog
 import { ChangeVersionDialogComponent } from './components/dialogs/change-version-dialog/change-version-dialog.component';
 import { ListViewComponent } from './components/list-view/list-view.component';
 import { FormViewComponent } from './components/form-view/form-view.component'
+import { EventsService } from './events.service';
+import { SelectDropDownModule } from 'ngx-select-dropdown';
+import { ScriptActionComponent } from './components/actions/script-action/script-action.component'
+
+const monacoConfig: NgxMonacoEditorConfig  = {
+  baseUrl: EnvVariables.AssetsDomain + sessionStorage.getItem('webappDirectory') +'/assets', // configure base path for monaco editor
+};
 
 @NgModule({
   declarations: [
@@ -31,7 +40,8 @@ import { FormViewComponent } from './components/form-view/form-view.component'
     EditDialogComponent,
     ChangeVersionDialogComponent,
     ListViewComponent,
-    FormViewComponent
+    FormViewComponent,
+    ScriptActionComponent
   ],
   imports: [
     CommonModule,
@@ -53,7 +63,9 @@ import { FormViewComponent } from './components/form-view/form-view.component'
     FormsModule,
     ReactiveFormsModule,
     DynamicModule.withComponents([]),
-    MatSelectModule
+    MatSelectModule,
+    MonacoEditorModule.forRoot(monacoConfig),
+    SelectDropDownModule
     ],
   exports: [
 
@@ -66,7 +78,9 @@ import { FormViewComponent } from './components/form-view/form-view.component'
     }],
     multi: true
   },
-  AddonApiService
+  AddonApiService,
+  HttpClient,
+  EventsService
 ],
   entryComponents: [
     PluginComponent,
