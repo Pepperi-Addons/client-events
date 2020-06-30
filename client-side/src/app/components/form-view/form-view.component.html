@@ -1,11 +1,11 @@
 <div class="content">
     <div class="rowHeader lg pepperi-border-bottom">
-        <h2 class="jobTitle">{{ event ? event.On.Key != '' : 'Scheduler_AddJobTitle' | translate}}</h2>
+        <h2 class="title">{{ 'Details' | translate}}</h2>
         <button type="button" class="btn pepperi-button mat-button strong color-main md pull-right flip" (click)="save(false)">{{'Apply' | translate}}</button>
         <button type="button" class="btn pepperi-button mat-button weak system md pull-right flip" (click)="save(true)">{{'Save' | translate}}</button>
         <button type="button" class="btn pepperi-button mat-button weak system md pull-right flip" (click)="cancel()">{{'Cancel' | translate}}</button>
     </div>
-    <mat-tab-group id="tabs">
+    <mat-tab-group id="tabs" (focusChange)="tabChanged()" >
         <mat-tab label="{{'General' | translate}}">
             <div class="mat-tab-cont">
                 <div class="">

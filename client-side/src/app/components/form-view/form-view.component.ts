@@ -166,4 +166,8 @@ export class FormViewComponent implements OnInit {
     })
   }
 
+  tabChanged() {
+    this.currentAction = undefined;
+  }
+
 }
