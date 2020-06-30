@@ -48,7 +48,7 @@ export class EventsService {
         // check if this row already exists
         if (event.UUID) {
             let events = await this.find({
-                where: `UUID = ${event.UUID}`,
+                where: `UUID = '${event.UUID}'`,
                 include_deleted: true
             });
 
