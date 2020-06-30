@@ -1,0 +1,28 @@
+<div id="edit-dialog" class="dialog">
+    <h2 class="pepperi-border-bottom" mat-dialog-title>
+        <span *ngIf="title?.length">{{ 'AddonsManager_AutomaticUpgrade' | translate}}</span>
+        <button mat-button [mat-dialog-close]="" class="pepperi-button icon-button md weak pull-right flip">
+            <mat-icon>
+                <svg class="svg-icon">
+                    <use attr.xlink:href="{{ svgIcons }}system-close"></use>
+                </svg>
+            </mat-icon>
+        </button>
+    </h2>
+    <div mat-dialog-content>
+        <div style="padding: 0 .5rem;">
+            <p>{{'Setting this as true will update the addon automatically'}}</p>
+            <br>             
+            <mat-checkbox [name]="'AutomaticUpgrade'" class="body-sm ellipsis" type="checkbox" (change)="outputData.automaticUpgrade = $event.checked"
+              [title]="'AutomaticUpgrade'"
+              [checked]="outputData.automaticUpgrade" [disabled]="false">
+              <span>{{ 'AddonsManager_AutomaticUpgrade' | translate }}</span>
+             </mat-checkbox>
+        </div>
+    </div>
+    <div mat-dialog-actionss class="pepperi-border-top">
+        <div class="spacing-element-negative">
+            <button class="spacing-element mat-button pepperi-button md weak pull-right flip" mat-button [mat-dialog-close]="outputData"  >{{ 'Confirm' | translate }}</button>
+        </div>
+    </div>
+</div>
