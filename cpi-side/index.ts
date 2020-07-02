@@ -1,35 +1,53 @@
 import { pepperi } from '@pepperi-addons/cpi-node-core';
 
-export const EventHookTypes = ['Before', 'After', 'Main'] as const;
-export type EventHookType = typeof EventHookTypes[number];
+export function load(event: any) {
+    const key = event.On.Key;
+    const hook = event.On.Hook;
 
-export interface Event {
-    UUID?: string;
-    CreationDate?: string;
-    ModificationDate?: string;
-    Hidden?: boolean;
-    Active?: boolean;
-    On: {
-        Key: string;
-        Hook: EventHookType;
-        Object?: {
-            Resource: string;
-            InternalID?: number;
-        };
+    const run = async () => {
+        return Promise.all(
+            event.Actions.map((action: { Type: any; ActionData: any }) => {
+                return new Promise(async (resolve) => {
+                    switch (action.Type) {
+                        case 'Script': {
+                            const AsyncFunction = Object.getPrototypeOf(async function () {
+                                /* empty function */
+                            }).constructor;
+                            const code = action.ActionData.Code;
+                            const f = new AsyncFunction('pepperi', code);
+                            await f(pepperi);
+
+                            resolve();
+
+                            break;
+                        }
+                        default: {
+                            resolve();
+                            break;
+                        }
+                    }
+                });
+            }),
+        );
     };
-    Actions: EventAction[];
-}
 
-export interface EventAction {
-    Type: string;
-    ActionData: any;
-}
-
-export function load(configuration: any) {
-    const object = configuration.On.Object;
-    pepperi.events.on(configuration.On.Key)?.use(
-        async (data, next, main) => {
-            console.log(data);
+    pepperi.events.on(key)?.use(async (data, next, main) => {
+        if (hook === 'Before') {
+            await run();
         }
-    );
+
+        if (hook === 'Main') {
+            main = {
+                run: async () => {
+                    await run();
+                },
+            };
+        }
+
+        await next(main);
+
+        if (hook === 'After') {
+            await run();
+        }
+    });
 }

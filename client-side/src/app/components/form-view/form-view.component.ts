@@ -1,8 +1,8 @@
-import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy, ViewChild } from '@angular/core';
 import { PluginService } from 'src/app/plugin.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EventsService } from 'src/app/events.service';
-import { PepperiListService } from '../pepperi-list/pepperi-list.component';
+import { PepperiListService, PepperiListContComponent } from '../pepperi-list/pepperi-list.component';
 import { Guid } from 'src/app/plugin.model';
 
 @Component({
@@ -10,7 +10,6 @@ import { Guid } from 'src/app/plugin.model';
   templateUrl: './form-view.component.html',
   styleUrls: ['./form-view.component.scss'],
   providers: [ PluginService ],
-  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FormViewComponent implements OnInit {
 
@@ -24,6 +23,7 @@ export class FormViewComponent implements OnInit {
     Actions: [
       {
         Type: 'Script',
+        Active: true,
         ActionData: {
           Code: 'const a = 123;'
         }
@@ -32,6 +32,10 @@ export class FormViewComponent implements OnInit {
   };
 
   currentAction: any = undefined;
+
+  @ViewChild('actionsList', { static: false})
+  actionsList: PepperiListContComponent
+  
   actionListService: PepperiListService = {
     getDataView: () => {
       return {
@@ -44,17 +48,27 @@ export class FormViewComponent implements OnInit {
         Title: 'Actions',
         Fields: [
           {
+            FieldID: 'Active',
+            Type: 'Boolean',
+            Title: 'Active',
+            Mandatory: false,
+            ReadOnly: true
+          },
+          {
             FieldID: 'Type',
             Type: 'TextBox',
             Title: 'Type',
             Mandatory: false,
             ReadOnly: true
-          }
+          },
         ],
         Columns: [
           {
+            Width: 1
+          },
+          {
             Width: 15
-          }
+          },
         ],
         FrozenColumnsCount: 0,
         MinimumColumnWidth: 0
@@ -76,21 +90,59 @@ export class FormViewComponent implements OnInit {
           Title: 'Delete',
           Filter: (obj) => true,
           Action: (obj) => { 
-            // todo
-            console.log('todo')
+            this.event.Actions.splice(obj.Index, 1);
+            this.actionsList.loadlist('');
+          }
+        },
+        {
+          Key: 'Activate',
+          Title: 'Activate',
+          Filter: (obj) => obj && !obj.Active,
+          Action: (obj) => { 
+            this.event.Actions[obj.Index].Active = true;
+            this.actionsList.loadlist('');
+          }
+        },
+        {
+          Key: 'De-Activate',
+          Title: 'De-Activate',
+          Filter: (obj) => obj && obj.Active,
+          Action: (obj) => { 
+            this.event.Actions[obj.Index].Active = false;
+            this.actionsList.loadlist('');
+          }
+        },
+        {
+          Key: 'Insert',
+          Title: 'Insert',
+          Filter: (obj) => true,
+          Action: (obj) => { 
+            this.event.Actions.splice(obj.Index + 1, 0, {
+              Type: 'Script',
+              Active: true,
+              ActionData: {
+                Code: ''
+              }
+            })
+            this.actionsList.loadlist('');
           }
         },
       ]
     },
 
     getList: () => {
-      return this.event.Actions.map((action, i) => {
-        return {
-          UUID: Guid.newGuid(),
-          Type: action.Type,
-          Index: i
-        }
-      });
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          resolve(this.event.Actions.map((action, i) => {
+            return {
+              UUID: Guid.newGuid(),
+              Type: action.Type,
+              Index: i,
+              Active: !!action.Active
+            }
+          }))
+        },500)
+      })
     }
   }
 

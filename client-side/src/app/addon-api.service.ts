@@ -43,7 +43,7 @@ export class AddonApiService
         this.addonStaticUrl = this.userService.getAddonStaticFolder();
         this.accessToken = this.userService.getUserToken();
         this.parsedToken = jwt(this.accessToken);
-        this.papiBaseURL = this.parsedToken["pepperi.baseUrl"]
+        this.papiBaseURL = this.parsedToken["pepperi.baseurl"]
         
     }
 

@@ -39,7 +39,7 @@ const monacoConfig: NgxMonacoEditorConfig  = {
     })
 
     window.monaco.languages.typescript.javascriptDefaults.addExtraLib(
-      await fetch('http://localhost:4400/assets/plugins/02b186b2-4b43-4765-962c-9e02231b5514/0.0.2/types.d.ts').then(res => res.text())
+      await fetch('https://cdn.pepperi.com/Addon/Public/02b186b2-4b43-4765-962c-9e02231b5514/0.0.5/types.d.ts').then(res => res.text())
     )
   }
 };

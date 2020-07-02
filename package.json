@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "init": "npm install && cd ./server-side && npm install && cd .. && cd ./client-side && npm install && cd ..",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "cd ./server-side && npm run build && cd .. && cd ./client-side && npm run build && cd ..",
     "publish-addon": "npm run build && publish-addon"

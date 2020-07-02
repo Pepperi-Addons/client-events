@@ -30,11 +30,15 @@
         </mat-tab>
         <mat-tab label="{{'Actions' | translate}}">
             <div class="mat-tab-cont">
-                <div class="action-form" *ngIf="currentAction">
-                    <app-script-action [(action)]='event.Actions[0]'></app-script-action>
-                </div>
                 <div class="actions-list" *ngIf="!currentAction">
                     <pep-list #actionsList [service]="actionListService"></pep-list>
+                </div>
+                <div class="action-form" *ngIf="currentAction">
+                    <div class="field-container">
+                        <label>Type: </label>
+                        <ngx-select-dropdown [(ngModel)]="currentAction.Type" [multiple]="false" [config]="selectOptions" [options]="['Script', 'Alert', 'Condition']"></ngx-select-dropdown>
+                    </div>
+                    <app-script-action *ngIf="currentAction.Type === 'Script'" [(action)]='currentAction'></app-script-action>
                 </div>
             </div>
         </mat-tab>
