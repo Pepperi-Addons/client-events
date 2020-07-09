@@ -27,7 +27,9 @@ import { ListViewComponent } from './components/list-view/list-view.component';
 import { FormViewComponent } from './components/form-view/form-view.component'
 import { EventsService } from './events.service';
 import { SelectDropDownModule } from 'ngx-select-dropdown';
-import { ScriptActionComponent } from './components/actions/script-action/script-action.component'
+import { ScriptActionComponent } from './components/actions/script-action/script-action.component';
+import { PepperiSelectComponent } from './components/pepperi-select/pepperi-select.component';
+import { PepperiTextboxComponent } from './components/pepperi-textbox/pepperi-textbox.component'
 
 const monacoConfig: NgxMonacoEditorConfig  = {
   baseUrl: EnvVariables.AssetsDomain + sessionStorage.getItem('webappDirectory') +'/assets', // configure base path for monaco editor
@@ -52,7 +54,9 @@ const monacoConfig: NgxMonacoEditorConfig  = {
     ChangeVersionDialogComponent,
     ListViewComponent,
     FormViewComponent,
-    ScriptActionComponent
+    ScriptActionComponent,
+    PepperiSelectComponent,
+    PepperiTextboxComponent,
   ],
   imports: [
     CommonModule,

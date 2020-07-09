@@ -7,6 +7,8 @@ import {UserService} from 'pepperi-user-service';
 
 import jwt from 'jwt-decode';
 import { HttpClient } from '@angular/common/http';
+import { PapiClient } from '@pepperi-addons/papi-sdk';
+import { tap } from 'rxjs/operators';
 
 
 @Injectable({
@@ -17,7 +19,6 @@ export class AddonApiService
     isInDevMode = false
     addonUUID = ''
     addonVersion = 'v1.0'
-    accessToken = ''
     parsedToken: any
     papiBaseURL = ''
     cdnBaseURL = 'https://cdn.staging.pepperi.com'
@@ -25,7 +26,12 @@ export class AddonApiService
     staticDir = ''
     addonStaticUrl = ''
 
-
+    get papiClient(): PapiClient {
+        return new PapiClient({
+            baseURL: this.papiBaseURL,
+            token: this.userService.getUserToken()
+        })
+    }
     constructor(
         private route: ActivatedRoute,
         private router: Router,
@@ -41,10 +47,9 @@ export class AddonApiService
         });
 
         this.addonStaticUrl = this.userService.getAddonStaticFolder();
-        this.accessToken = this.userService.getUserToken();
-        this.parsedToken = jwt(this.accessToken);
+        const accessToken = this.userService.getUserToken();
+        this.parsedToken = jwt(accessToken);
         this.papiBaseURL = this.parsedToken["pepperi.baseurl"]
-        
     }
 
     getAddonApiBaseURL(): string {
@@ -57,25 +62,34 @@ export class AddonApiService
     }
 
     get(url: string) {
+        this.userService.setShowLoading(true);
+        const t0 = performance.now();
         const fullURL = url.startsWith('http') ? url : this.papiBaseURL + url;
          const options = { 
              'headers': {
-                 'Authorization': 'Bearer ' + this.accessToken
+                 'Authorization': 'Bearer ' + this.userService.getUserToken()
              }
          };
-         return this.httpClient.get<any>(fullURL, options);
+         return this.httpClient.get<any>(fullURL, options).pipe(
+             tap(() => console.log(`GET ${fullURL} took ${(performance.now() - t0).toFixed(2)}ms`)),
+             tap(() => this.userService.setShowLoading(false))
+         );
 
     }
     
     post(url: string, body: any) {
+        this.userService.setShowLoading(true);
+        const t0 = performance.now();
         const fullURL = url.startsWith('http') ? url : this.papiBaseURL + url;
-         const options = { 
-             'headers': {
-                 'Authorization': 'Bearer ' + this.accessToken
-             }
-         };
-         return this.httpClient.post<any>(fullURL, body, options);
-
+        const options = { 
+            'headers': {
+                'Authorization': 'Bearer ' + this.userService.getUserToken()
+            }
+        };
+        return this.httpClient.post<any>(fullURL, body, options).pipe(
+            tap(() => console.log(`GET ${fullURL} took ${(performance.now() - t0).toFixed(2)}ms`)),
+            tap(() => this.userService.setShowLoading(false))
+        );
     }
 
     clientApiCall(params) {

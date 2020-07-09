@@ -43,6 +43,11 @@ export interface PepperiListService {
     Filter: (obj: any) => boolean;
     Action: (obj: any) => void;
   }[];
+  rightButtons?(): {
+    Title: string;
+    Icon: string;
+    Action: () => void;
+  }[];
 }
 
 @Component({
@@ -177,6 +182,11 @@ export class PepperiListContComponent implements OnInit {
     const topLeftButtons = [];
     const dataView = this.service.getDataView();
 
+    let rightButtons = this.service.rightButtons() || [];
+    rightButtons = rightButtons.map(action => {
+      return new TopBarButton(action.Title, () => action.Action(), action.Icon, ICON_POSITION.End, true, null, 'pepperi-button mat-button strong color-main lg');
+    })
+
     this.listActions = this.getListActions();
     this.topBarInputs = {
       showSearch: false,
@@ -184,7 +194,7 @@ export class PepperiListContComponent implements OnInit {
       listActionsXDirection: 'after',
       listActionsData: this.listActions,
       leftButtons: topLeftButtons,
-      rightButtons: topRightButtons,
+      rightButtons: rightButtons,
       showTotals: false,
       showListActions: false,
       topbarTitle: dataView.Title || '',

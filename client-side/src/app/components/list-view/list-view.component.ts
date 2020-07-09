@@ -4,6 +4,8 @@ import { AddonApiService } from 'src/app/addon-api.service';
 import { PepperiListService, PepperiListContComponent } from '../pepperi-list/pepperi-list.component';
 import { EventsService } from 'src/app/events.service';
 import { Router, ActivatedRoute } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
+import { map, flatMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-list-view',
@@ -21,39 +23,59 @@ export class ListViewComponent implements OnInit {
           ScreenSize: 'Landscape'
         },
         Type: 'Grid',
-        Title: '',
+        Title: this.translate.instant('Events'),
         Fields: [
           {
-            FieldID: 'On.Key',
+            FieldID: 'Description',
             Type: 'TextBox',
-            Title: 'Event',
+            Title: this.translate.instant('Description'),
             Mandatory: false,
             ReadOnly: true
           },
           {
-            FieldID: 'On.Hook',
+            FieldID: 'On.Object.Name',
             Type: 'TextBox',
-            Title: 'Hook',
+            Title: this.translate.instant('Type'),
+            Mandatory: false,
+            ReadOnly: true
+          },
+          {
+            FieldID: 'On.Key',
+            Type: 'TextBox',
+            Title: this.translate.instant('Event Name'),
+            Mandatory: false,
+            ReadOnly: true
+          },
+          {
+            FieldID: 'On.Field.Name',
+            Type: 'TextBox',
+            Title: this.translate.instant('Field Name'),
             Mandatory: false,
             ReadOnly: true
           },
           {
             FieldID: 'Active',
             Type: 'Boolean',
-            Title: 'Active',
+            Title: this.translate.instant('Active'),
             Mandatory: false,
             ReadOnly: true
           },
         ],
         Columns: [
           {
-            Width: 15
+            Width: 10
           },
           {
-            Width: 15
+            Width: 10
           },
           {
-            Width: 5
+            Width: 10
+          },
+          {
+            Width: 10
+          },
+          {
+            Width: 10
           }
         ],
         FrozenColumnsCount: 0,
@@ -79,32 +101,6 @@ export class ListViewComponent implements OnInit {
           }
         },
         {
-          Key: 'Activate',
-          Title: 'Activate',
-          Filter: (obj) => { 
-            return obj && !obj.Active 
-          },
-          Action: (obj) => { 
-            obj.Active = true;
-            this.eventsService.saveEvent(obj).subscribe(res => {
-              this.reload()
-            });
-          }
-        },
-        {
-          Key: 'De-Activate',
-          Title: 'De-Activate',
-          Filter: (obj) => { 
-            return obj && obj.Active 
-          },
-          Action: (obj) => { 
-            obj.Active = false;
-            this.eventsService.saveEvent(obj).subscribe(res => {
-              this.reload();
-            });
-          }
-        },
-        {
           Key: 'Delete',
           Title: 'Delete',
           Filter: (obj) => true,
@@ -115,6 +111,16 @@ export class ListViewComponent implements OnInit {
             });
           }
         },
+      ]
+    },
+
+    rightButtons: () => {
+      return [
+        {
+          Title: this.translate.instant('Add'),
+          Icon: '',
+          Action: () => this.add()
+        }
       ]
     },
 
@@ -131,6 +137,7 @@ export class ListViewComponent implements OnInit {
     private eventsService: EventsService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
+    private translate: TranslateService,
   ) { }
 
   ngOnInit(): void {

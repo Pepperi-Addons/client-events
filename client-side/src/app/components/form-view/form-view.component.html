@@ -1,47 +1,42 @@
 <div class="content">
-    <div class="rowHeader lg pepperi-border-bottom">
-        <h2 class="title">{{ 'Details' | translate}}</h2>
-        <button type="button" class="btn pepperi-button mat-button strong color-main md pull-right flip" (click)="save(false)">{{'Apply' | translate}}</button>
-        <button type="button" class="btn pepperi-button mat-button weak system md pull-right flip" (click)="save(true)">{{'Save' | translate}}</button>
-        <button type="button" class="btn pepperi-button mat-button weak system md pull-right flip" (click)="cancel()">{{'Cancel' | translate}}</button>
+    <div class="header lg pepperi-border-bottom">
+        <h2 class="title pull-left">{{ 'Edit' | translate}}</h2>
+        <button type="button" class="btn pepperi-button mat-button strong color-main md pull-right flip spacing-element" (click)="save()">{{'Save' | translate}}</button>
+        <button type="button" class="btn pepperi-button mat-button weak system md pull-right flip spacing-element" (click)="cancel()">{{'Cancel' | translate}}</button>
     </div>
-    <mat-tab-group id="tabs" (focusChange)="tabChanged()" >
-        <mat-tab label="{{'General' | translate}}">
-            <div class="mat-tab-cont">
-                <div class="">
-                    <div class="tabBody">
-                        <div class="field-container">
-                            <label>Hook: </label>
-                            <ngx-select-dropdown [(ngModel)]="event.On.Hook" [multiple]="false" [config]="selectOptions" [options]="['Before', 'After', 'Main']"></ngx-select-dropdown>
-                        </div>
-                        
-                        <div class="field-container">
-                            <label>Event: </label>
-                            <ngx-select-dropdown [(ngModel)]="event.On.Key" [multiple]="false" [config]="selectOptions" [options]="['TSAButton', 'HomeScreenButton']"></ngx-select-dropdown>
-                        </div>
-                        
-                        <div class="field-container">
-                            <mat-checkbox [(ngModel)]="event.Active" name="scheduled"></mat-checkbox>
-                            <label> {{ 'Active' | translate }} </label>
-                        </div>
-                    </div>
-                </div>
+    <h5>{{ 'Define the event details' | translate}}</h5>
+    <br/>
+    <div *ngIf="!loading" class="form">
+        <div class="grid-container">
+            <div class="description">
+                <pepperi-textbox [required]="true" [label]="'Description' | translate" [(value)]='event.Description'></pepperi-textbox>
             </div>
-        </mat-tab>
-        <mat-tab label="{{'Actions' | translate}}">
-            <div class="mat-tab-cont">
-                <div class="actions-list" *ngIf="!currentAction">
-                    <pep-list #actionsList [service]="actionListService"></pep-list>
-                </div>
-                <div class="action-form" *ngIf="currentAction">
-                    <div class="field-container">
-                        <label>Type: </label>
-                        <ngx-select-dropdown [(ngModel)]="currentAction.Type" [multiple]="false" [config]="selectOptions" [options]="['Script', 'Alert', 'Condition']"></ngx-select-dropdown>
-                    </div>
-                    <app-script-action *ngIf="currentAction.Type === 'Script'" [(action)]='currentAction'></app-script-action>
-                </div>
+            <div class="active">
+                <pepperi-select [label]="'Active' | translate" [(value)]="event.Active" [options]="options.activeOptions"></pepperi-select>
             </div>
-        </mat-tab>
-
-    </mat-tab-group>
+            <div class="object">
+                <pepperi-select [label]="'Object' | translate" [(value)]="event.On.Object.Resource" (valueChange)="objectChanged()" [options]="options.objectOptions"></pepperi-select>
+            </div>
+            <div class="atd">
+                <pepperi-select [required]="true" [label]="'Type' | translate" [(value)]="event.On.Object.InternalID" (valueChange)="atdChanged()" [options]="options.atdOptions"></pepperi-select>
+            </div>
+            <div class="event">
+                <pepperi-select [required]="true" [label]="'Event' | translate" [(value)]="event.On.Key" (valueChange)="eventChanged()" [options]="options.eventOptions"></pepperi-select>
+            </div>
+            <div class="field">
+                <pepperi-select [disabled]="!options.fieldsEnabled" [required]="options.fieldsEnabled" [label]="'Field' | translate" [(value)]="event.On.Field" [options]="options.fieldOptions"></pepperi-select>
+            </div>
+            <div class="execution">
+                <pepperi-select [label]="'Execution' | translate" [value]="event.On.Hook" [options]="options.executionOptions"></pepperi-select>
+            </div>
+            <div class="code">
+                <div class="rowHeader pepperi-border-bottom">
+                    <div class="body-lg pull-left">{{ 'Script' | translate}}</div>
+                </div>
+                <p class="body-sm">Enter your custom logic here</p>
+                <ngx-monaco-editor class="my-code-editor" [options]="editorOptions" [(ngModel)]="event.Action.Code"></ngx-monaco-editor>
+                <button type="button" class="btn pepperi-button mat-button strong color-main md pull-right flip spacing-element" (click)="run()">{{'Test Code' | translate}}</button>
+            </div>
+          </div>          
+    </div>
 </div>

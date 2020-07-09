@@ -1,9 +1,14 @@
-import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy, ViewChild } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy, ViewChild, OnChanges, SimpleChanges } from '@angular/core';
 import { PluginService } from 'src/app/plugin.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EventsService } from 'src/app/events.service';
-import { PepperiListService, PepperiListContComponent } from '../pepperi-list/pepperi-list.component';
 import { Guid } from 'src/app/plugin.model';
+import { TranslateService } from '@ngx-translate/core';
+import ClientApi from '@pepperi-addons/client-api'
+import { AddonApiService } from 'src/app/addon-api.service';
+import { PepperiObject, DataViewFieldType } from '@pepperi-addons/papi-sdk';
+import { filter } from 'rxjs/operators';
+import { Event } from '../../shared/entities';
 
 @Component({
   selector: 'app-form-view',
@@ -13,159 +18,23 @@ import { Guid } from 'src/app/plugin.model';
 })
 export class FormViewComponent implements OnInit {
 
+  loading = true;
   eventUUID: string = ''
-  event: any = {
-    Active: true,
-    On: {
-      Key: '',
-      Hook: 'Before'
-    },
-    Actions: [
-      {
-        Type: 'Script',
-        Active: true,
-        ActionData: {
-          Code: 'const a = 123;'
-        }
-      }
-    ]
-  };
-
-  currentAction: any = undefined;
-
-  @ViewChild('actionsList', { static: false})
-  actionsList: PepperiListContComponent
+  event: Event;
   
-  actionListService: PepperiListService = {
-    getDataView: () => {
-      return {
-        Context: {
-          Name: '',
-          Profile: { InternalID: 0 },
-          ScreenSize: 'Landscape'
-        },
-        Type: 'Grid',
-        Title: 'Actions',
-        Fields: [
-          {
-            FieldID: 'Active',
-            Type: 'Boolean',
-            Title: 'Active',
-            Mandatory: false,
-            ReadOnly: true
-          },
-          {
-            FieldID: 'Type',
-            Type: 'TextBox',
-            Title: 'Type',
-            Mandatory: false,
-            ReadOnly: true
-          },
-        ],
-        Columns: [
-          {
-            Width: 1
-          },
-          {
-            Width: 15
-          },
-        ],
-        FrozenColumnsCount: 0,
-        MinimumColumnWidth: 0
-      }
-    },
-
-    getActions: () => {
-      return [
-        {
-          Key: 'Edit',
-          Title: 'Edit',
-          Filter: (obj) => true,
-          Action: (obj) => { 
-            this.currentAction = this.event.Actions[obj.Index];
-          }
-        },
-        {
-          Key: 'Delete',
-          Title: 'Delete',
-          Filter: (obj) => true,
-          Action: (obj) => { 
-            this.event.Actions.splice(obj.Index, 1);
-            this.actionsList.loadlist('');
-          }
-        },
-        {
-          Key: 'Activate',
-          Title: 'Activate',
-          Filter: (obj) => obj && !obj.Active,
-          Action: (obj) => { 
-            this.event.Actions[obj.Index].Active = true;
-            this.actionsList.loadlist('');
-          }
-        },
-        {
-          Key: 'De-Activate',
-          Title: 'De-Activate',
-          Filter: (obj) => obj && obj.Active,
-          Action: (obj) => { 
-            this.event.Actions[obj.Index].Active = false;
-            this.actionsList.loadlist('');
-          }
-        },
-        {
-          Key: 'Insert',
-          Title: 'Insert',
-          Filter: (obj) => true,
-          Action: (obj) => { 
-            this.event.Actions.splice(obj.Index + 1, 0, {
-              Type: 'Script',
-              Active: true,
-              ActionData: {
-                Code: ''
-              }
-            })
-            this.actionsList.loadlist('');
-          }
-        },
-      ]
-    },
-
-    getList: () => {
-      return new Promise((resolve, reject) => {
-        setTimeout(() => {
-          resolve(this.event.Actions.map((action, i) => {
-            return {
-              UUID: Guid.newGuid(),
-              Type: action.Type,
-              Index: i,
-              Active: !!action.Active
-            }
-          }))
-        },500)
-      })
-    }
-  }
-
-  selectOptions = {
-    displayKey: "description", //if objects array passed which key to be displayed defaults to description
-    search: false, //true/false for the search functionlity defaults to false,
-    height: 'auto', //height of the list so that if there are more no of items it can show a scroll defaults to auto. With auto height scroll will never appear
-    placeholder:'Select', // text to be displayed when no item is selected defaults to Select,
-    customComparator: ()=>{}, // a custom function using which user wants to sort the items. default is undefined and Array.sort() will be used in that case,
-    limitTo: 10, // a number thats limits the no of options displayed in the UI similar to angular's limitTo pipe
-    moreText: 'more', // text to be displayed whenmore than one items are selected like Option 1 + 5 more
-    noResultsFound: 'No results found!', // text to be displayed when no items are found while searching
-    searchPlaceholder:'Search', // label thats displayed in search input,
-    searchOnKey: 'name', // key on which search should be performed this will be selective search. if undefined this will be extensive search on all keys
-    clearOnSelection: false, // clears search criteria when an option is selected if set to true, default is false
-    inputDirection: 'ltr', // the direction of the search input can be rtl or ltr(default)
-  }
-
+  editorOptions = {
+    theme: "vs-light",
+    language: "javascript",
+    automaticLayout: true
+  };
+  
   constructor(
     private activatedRoute: ActivatedRoute,
     private router: Router,
     private eventService: EventsService,
-    public cd: ChangeDetectorRef,
+    private addonService: AddonApiService,
+    private translate: TranslateService,
+    private cd: ChangeDetectorRef
   ) { 
     this.activatedRoute.queryParams.subscribe(params => {
       this.eventUUID = params['uuid'] || '';
@@ -173,7 +42,39 @@ export class FormViewComponent implements OnInit {
       if (this.eventUUID) {
         this.eventService.getEvent(this.eventUUID).subscribe(event => {
           this.event = event;
+          this.updateOptions();
+          this.loading = false;
+          this.cd.detectChanges();
         })
+      }
+      else {
+        this.loading = false;
+        this.event = {
+          UUID: '',
+          CreationDate: '',
+          ModificationDate: '',
+          Hidden: false,
+          Active: true,
+          Description: '',
+          On: {
+            Key: undefined,
+            Hook: 'Before',
+            Object: {
+              Resource: 'transactions',
+              InternalID: 0,
+              Name: ''
+            },
+            Field: {
+              FieldID: '',
+              Name: ''
+            },
+          },
+          Action: {
+            Type: 'Script',
+            Code: "console.log('hello world!!')"
+          }
+        };
+        this.updateOptions();
       }
     })
   }
@@ -181,28 +82,16 @@ export class FormViewComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  save(back: boolean) {
-    this.currentAction = undefined;
+  save() {
     this.eventService.saveEvent(this.event).subscribe(res => {
       if (res.UUID) {
-        if (back) {
-          this.router.navigate([], {
-            queryParams: {
-              view: 'list'
-            },
-            queryParamsHandling: 'merge',
-            relativeTo: this.activatedRoute
-          })
-        }
-        else {
-          this.router.navigate([], {
-            queryParams: {
-              uuid: res.UUID
-            },
-            queryParamsHandling: 'merge',
-            relativeTo: this.activatedRoute
-          })
-        }
+        this.router.navigate([], {
+          queryParams: {
+            view: 'list'
+          },
+          queryParamsHandling: 'merge',
+          relativeTo: this.activatedRoute
+        })
       }
     })
   }
@@ -218,8 +107,77 @@ export class FormViewComponent implements OnInit {
     })
   }
 
-  tabChanged() {
-    this.currentAction = undefined;
+  // here we create the client API by providing the bridge to the CPIService
+  private pepperi = ClientApi((params) => {
+    return this.addonService.clientApiCall(params);
+  });
+
+  async run() {
+    // this get the async function constructor even after transpiling to es2015
+    let AsyncFunction = eval('Object.getPrototypeOf(async function(){}).constructor');
+    const a: (pepperi: any) => Promise<any> = new AsyncFunction('pepperi', this.event.Action.Code);
+    await a(this.pepperi);
   }
 
+  options = {
+    eventOptions: {},
+    activeOptions: {
+      Yes: true,
+      No: false
+    },
+    fieldOptions: {},
+    objectOptions: {
+      Activity: 'activities',
+      Transaction: 'transactions',
+      'Transaction Lines': 'transaction_lines'
+    },
+    atdOptions: {},
+    executionOptions: {},
+    fieldsEnabled: false
+  }
+
+  async updateOptions() {
+
+    this.options.eventOptions = this.eventService.getEventsTypes(this.event.On.Object.Resource);
+
+    this.options.executionOptions = this.eventService.getExecutions(this.event.On.Key);
+
+    this.options.fieldsEnabled = this.event.On.Object.InternalID && this.eventService.needsFields(this.event.On.Key);
+
+    this.eventService.getAtds(this.event.On.Object.Resource).then(res => {
+      this.options.atdOptions = res;
+    })
+
+    if (this.options.fieldsEnabled) {
+      this.eventService.getFields(this.event.On.Key, this.event.On.Object.InternalID).then((res) => {
+        this.options.fieldOptions = res
+      })
+    }
+  }
+
+  objectChanged() {
+    this.event.On.Object.InternalID = 0;
+    this.event.On.Key = '';
+    this.event.On.Field = {
+      FieldID: '',
+      Name: ''
+    };
+    this.updateOptions()
+  }
+
+  atdChanged() {
+    this.event.On.Field = {
+      FieldID: '',
+      Name: ''
+    };
+    this.updateOptions()
+  }
+
+  eventChanged() {
+    this.event.On.Field = {
+      FieldID: '',
+      Name: ''
+    };
+    this.updateOptions()
+  }
 }

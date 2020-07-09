@@ -51,11 +51,17 @@ export default [{
            if (source === 'perf_hooks') {
               return source;
            }
+           else if (source === 'node-fetch') {
+            return source;
+           }
            return null;
         },
         load(id) {
          if (id === 'perf_hooks') {
             return 'export default { performance }';
+         }
+         if (id === 'node-fetch') {
+            return 'export default window.fetch.bind(window)';
          }
          return null;
         }
@@ -77,7 +83,7 @@ export default [{
      }),
      commonjs({
         namedExports: {
-           '@pepperi-addons/papi-sdk': ['DataViewFieldTypes']
+           '@pepperi-addons/papi-sdk': ['DataViewFieldTypes', 'PapiClient']
         }
      }),
      includePaths({ paths: ["s"] }),
