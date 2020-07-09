@@ -13,7 +13,13 @@ export class EventsService {
   // a map of fields per atd
   fields: { [key: number]: ApiFieldObject[] } = {}
 
-  atds: PepperiObject[] = []
+  _atds: PepperiObject[] = []
+  async atds(): Promise<PepperiObject[]> {
+    if (!this._atds.length) {
+      this._atds = await this.papiClient.metaData.pepperiObjects.iter().toArray();
+    }
+    return this._atds;
+  }
 
   constructor(
     private addonService: AddonApiService,
@@ -38,16 +44,11 @@ export class EventsService {
   }
 
   async getAtds(type?: string): Promise<{ [key: string]: number }> {
-    // lazely load atds
-    if (!this.atds.length) {
-      this.atds = await this.papiClient.metaData.pepperiObjects.iter().toArray();
-    }
-
-    return this.atds.filter(
+    return this.atds().then(res => res.filter(
       atd => type ? atd.Type === type : true
     ).reduce(
       (obj, item) => (obj[item.SubTypeName] = parseInt(item.SubTypeID), obj), {}
-    )
+    ))
   }
 
   static events: { 
@@ -108,12 +109,9 @@ export class EventsService {
 
   async getFields(event: string, atdId: number) {
     // lazely load fields per atd
+    const atd = await this.atds().then(res => res.find(atd => atd.SubTypeID === atdId.toString()));
     if (!this.fields[atdId]) {
-      this.fields[atdId] = await this.papiClient.metaData.type(
-        this.atds.find(
-          atd => atd.SubTypeID === atdId.toString()
-        ).Type
-      ).fields.get();
+      this.fields[atdId] = await this.papiClient.metaData.type(atd.Type).fields.get();
     }
 
     return this.fields[atdId]

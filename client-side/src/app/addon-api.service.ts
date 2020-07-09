@@ -87,7 +87,7 @@ export class AddonApiService
             }
         };
         return this.httpClient.post<any>(fullURL, body, options).pipe(
-            tap(() => console.log(`GET ${fullURL} took ${(performance.now() - t0).toFixed(2)}ms`)),
+            tap(() => console.log(`POST ${fullURL} took ${(performance.now() - t0).toFixed(2)}ms`)),
             tap(() => this.userService.setShowLoading(false))
         );
     }

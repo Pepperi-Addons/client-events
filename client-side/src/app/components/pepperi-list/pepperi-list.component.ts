@@ -126,7 +126,6 @@ export class PepperiListContComponent implements OnInit {
   }
 
   ngOnInit(): void {
-
   }
 
   pepperiListOnInit(compRef: ComponentRef<any>, apiEndpoint) {

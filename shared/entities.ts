@@ -36,3 +36,12 @@ export interface Configuration {
 
 export const CPI_NODE_ADDON_UUID = 'bb6ee826-1c6b-4a11-9758-40a46acb69c5';
 export const CLIENT_EVENT_MODULE_NAME = '@pepperi-addons/client-events';
+
+export interface AlertData {
+    title: string;
+    message: string;
+    actions: {
+        key: string;
+        title: string;
+    }[];
+}

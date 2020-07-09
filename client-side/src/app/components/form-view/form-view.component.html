@@ -24,7 +24,7 @@
                 <pepperi-select [required]="true" [label]="'Event' | translate" [(value)]="event.On.Key" (valueChange)="eventChanged()" [options]="options.eventOptions"></pepperi-select>
             </div>
             <div class="field">
-                <pepperi-select [disabled]="!options.fieldsEnabled" [required]="options.fieldsEnabled" [label]="'Field' | translate" [(value)]="event.On.Field" [options]="options.fieldOptions"></pepperi-select>
+                <pepperi-select [disabled]="!options.fieldsEnabled" [required]="options.fieldsEnabled" [label]="'Field' | translate" [value]="event.On.Field ? event.On.Field.FieldID : ''" (valueChange)="event.On.Field.FieldID = $event.value" [options]="options.fieldOptions"></pepperi-select>
             </div>
             <div class="execution">
                 <pepperi-select [label]="'Execution' | translate" [value]="event.On.Hook" [options]="options.executionOptions"></pepperi-select>

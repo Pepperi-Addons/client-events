@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy, ViewChild, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy, ViewChild, OnChanges, SimpleChanges, OnDestroy } from '@angular/core';
 import { PluginService } from 'src/app/plugin.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EventsService } from 'src/app/events.service';
@@ -8,7 +8,13 @@ import ClientApi from '@pepperi-addons/client-api'
 import { AddonApiService } from 'src/app/addon-api.service';
 import { PepperiObject, DataViewFieldType } from '@pepperi-addons/papi-sdk';
 import { filter } from 'rxjs/operators';
-import { Event } from '../../shared/entities';
+import { Event, AlertData } from '../../shared/entities';
+
+//@ts-ignore
+import {AddonService} from 'pepperi-addon-service';
+//@ts-ignore
+import {DialogData, DialogDataType} from 'pepperi-dialog';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-form-view',
@@ -16,11 +22,13 @@ import { Event } from '../../shared/entities';
   styleUrls: ['./form-view.component.scss'],
   providers: [ PluginService ],
 })
-export class FormViewComponent implements OnInit {
+export class FormViewComponent implements OnInit, OnDestroy {
 
   loading = true;
   eventUUID: string = ''
   event: Event;
+
+  private routeSubscription: Subscription
   
   editorOptions = {
     theme: "vs-light",
@@ -32,11 +40,12 @@ export class FormViewComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private router: Router,
     private eventService: EventsService,
-    private addonService: AddonApiService,
+    private addonApiService: AddonApiService,
+    private cd: ChangeDetectorRef,
+    private addonService: AddonService,
     private translate: TranslateService,
-    private cd: ChangeDetectorRef
   ) { 
-    this.activatedRoute.queryParams.subscribe(params => {
+    this.routeSubscription = this.activatedRoute.queryParams.subscribe(params => {
       this.eventUUID = params['uuid'] || '';
 
       if (this.eventUUID) {
@@ -82,21 +91,25 @@ export class FormViewComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  ngOnDestroy(): void {
+    if (this.routeSubscription) {
+      this.routeSubscription.unsubscribe();
+    }
+  }
+
   save() {
     this.eventService.saveEvent(this.event).subscribe(res => {
       if (res.UUID) {
-        this.router.navigate([], {
-          queryParams: {
-            view: 'list'
-          },
-          queryParamsHandling: 'merge',
-          relativeTo: this.activatedRoute
-        })
+        this.goBack()
       }
     })
   }
 
   cancel() {
+    this.goBack()
+  }
+
+  goBack() {
     this.router.navigate([], {
       queryParams: {
         view: 'list',
@@ -109,14 +122,34 @@ export class FormViewComponent implements OnInit {
 
   // here we create the client API by providing the bridge to the CPIService
   private pepperi = ClientApi((params) => {
-    return this.addonService.clientApiCall(params);
+    return this.addonApiService.clientApiCall(params);
   });
 
   async run() {
     // this get the async function constructor even after transpiling to es2015
     let AsyncFunction = eval('Object.getPrototypeOf(async function(){}).constructor');
-    const a: (pepperi: any) => Promise<any> = new AsyncFunction('pepperi', this.event.Action.Code);
-    await a(this.pepperi);
+
+    let alert = async (data: AlertData): Promise<{ key: string }> => {
+      return new Promise((resolve, reject) => {
+        const buttons = data.actions.map(action => {
+          return {
+            title: action.title,
+            callback: () => {
+              resolve({
+                key: action.key
+              })
+            },
+            className: 'pepperi-button md',
+          }
+        })
+        const dialogData = new DialogData(data.title, data.message, DialogDataType.TextArea, buttons);
+  
+        this.addonService.openDialog(dialogData, 'pepperi-modalbox', '16rem');
+      });
+    }
+
+    const a: (...args) => Promise<any> = new AsyncFunction('pepperi', 'alert', this.event.Action.Code);
+    await a(this.pepperi, alert);
   }
 
   options = {

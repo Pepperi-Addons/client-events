@@ -21,6 +21,9 @@ import { AddonApiService } from './addon-api.service';
 import { PepperiListContComponent } from './components/pepperi-list/pepperi-list.component';
 //@ts-ignore
 import { UserService } from 'pepperi-user-service';
+//@ts-ignore
+import { AddonService } from 'pepperi-addon-service';
+
 import {EditDialogComponent } from './components/dialogs/edit-dialog/edit-dialog.component';
 import { ChangeVersionDialogComponent } from './components/dialogs/change-version-dialog/change-version-dialog.component';
 import { ListViewComponent } from './components/list-view/list-view.component';
@@ -80,7 +83,7 @@ const monacoConfig: NgxMonacoEditorConfig  = {
     DynamicModule.withComponents([]),
     MatSelectModule,
     MonacoEditorModule.forRoot(monacoConfig),
-    SelectDropDownModule
+    SelectDropDownModule,
     ],
   exports: [
 

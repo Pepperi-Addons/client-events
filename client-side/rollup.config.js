@@ -107,6 +107,7 @@ export default [{
      '@angular/router',
      //'pepperi-generic-list-service',
      'pepperi-user-service',
+     'pepperi-addon-service',
      'pepperi-ngx-json-viewer',
       //  'pepperi-environment-variables',
    ],
