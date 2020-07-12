@@ -1,5 +1,4 @@
-import { debug } from 'util';
-import { Injectable, Input } from "@angular/core";
+import { Injectable } from "@angular/core";
 import { ActivatedRoute, Router } from '@angular/router';
 
 //@ts-ignore
@@ -18,13 +17,10 @@ export class AddonApiService
 {
     isInDevMode = false
     addonUUID = ''
-    addonVersion = 'v1.0'
     parsedToken: any
     papiBaseURL = ''
-    cdnBaseURL = 'https://cdn.staging.pepperi.com'
     localhostBaseURL = 'http://localhost:4400'
     staticDir = ''
-    addonStaticUrl = ''
 
     get papiClient(): PapiClient {
         return new PapiClient({
@@ -46,7 +42,6 @@ export class AddonApiService
             this.isInDevMode = params["dev"] || false;
         });
 
-        this.addonStaticUrl = this.userService.getAddonStaticFolder();
         const accessToken = this.userService.getUserToken();
         this.parsedToken = jwt(accessToken);
         this.papiBaseURL = this.parsedToken["pepperi.baseurl"]
@@ -56,9 +51,8 @@ export class AddonApiService
         return this.isInDevMode ? this.localhostBaseURL : `${this.papiBaseURL}/addons/api/${this.addonUUID}`;
     }
 
-    getAddonStaticFolderURL(callbackFunc = null): string {
-        var baseURL = this.isInDevMode ? this.localhostBaseURL : this.cdnBaseURL;
-        return `${baseURL}/Addon/Public/${this.addonUUID}/${this.addonVersion}/`;
+    getAddonStaticFolderURL(): string {
+        return this.userService.getAddonStaticFolder();
     }
 
     get(url: string) {

@@ -66,19 +66,19 @@ export class EventsService {
     },
     TSAButton: {
       types: ['transaction_lines', 'transactions', 'activities', 'contacts'],
-      blockExecutions: ['Main'],
+      blockExecutions: [],
       field: true,
       fieldFilter: (field) => field.UIType.Name === 'Button'
     },
     UnitsQuantity: {
       types: ['transaction_lines'],
-      blockExecutions: ['Main'],
+      blockExecutions: [],
       field: true,
       fieldFilter: field => field.FieldID === 'UnitsQuantity' || ['NumberIntegerQuantitySelector', 'NumberRealQuantitySelector'].includes(field.UIType.Name)
     },
     CartPress: {
       types: ['transactions'],
-      blockExecutions: ['Main'],
+      blockExecutions: ['After'],
       field: false
     },
   }

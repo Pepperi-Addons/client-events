@@ -2,18 +2,12 @@ import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy, ViewChil
 import { PluginService } from 'src/app/plugin.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EventsService } from 'src/app/events.service';
-import { Guid } from 'src/app/plugin.model';
 import { TranslateService } from '@ngx-translate/core';
-import ClientApi from '@pepperi-addons/client-api'
 import { AddonApiService } from 'src/app/addon-api.service';
-import { PepperiObject, DataViewFieldType } from '@pepperi-addons/papi-sdk';
-import { filter } from 'rxjs/operators';
-import { Event, AlertData } from '../../shared/entities';
+import { Event } from '../../shared/entities';
 
 //@ts-ignore
 import {AddonService} from 'pepperi-addon-service';
-//@ts-ignore
-import {DialogData, DialogDataType} from 'pepperi-dialog';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -30,19 +24,13 @@ export class FormViewComponent implements OnInit, OnDestroy {
 
   private routeSubscription: Subscription
   
-  editorOptions = {
-    theme: "vs-light",
-    language: "javascript",
-    automaticLayout: true
-  };
-  
   constructor(
     private activatedRoute: ActivatedRoute,
     private router: Router,
     private eventService: EventsService,
     private addonApiService: AddonApiService,
     private cd: ChangeDetectorRef,
-    private addonService: AddonService,
+    // private addonService: AddonService,
     private translate: TranslateService,
   ) { 
     this.routeSubscription = this.activatedRoute.queryParams.subscribe(params => {
@@ -118,38 +106,6 @@ export class FormViewComponent implements OnInit, OnDestroy {
       queryParamsHandling: 'merge',
       relativeTo: this.activatedRoute
     })
-  }
-
-  // here we create the client API by providing the bridge to the CPIService
-  private pepperi = ClientApi((params) => {
-    return this.addonApiService.clientApiCall(params);
-  });
-
-  async run() {
-    // this get the async function constructor even after transpiling to es2015
-    let AsyncFunction = eval('Object.getPrototypeOf(async function(){}).constructor');
-
-    let alert = async (data: AlertData): Promise<{ key: string }> => {
-      return new Promise((resolve, reject) => {
-        const buttons = data.actions.map(action => {
-          return {
-            title: action.title,
-            callback: () => {
-              resolve({
-                key: action.key
-              })
-            },
-            className: 'pepperi-button md',
-          }
-        })
-        const dialogData = new DialogData(data.title, data.message, DialogDataType.TextArea, buttons);
-  
-        this.addonService.openDialog(dialogData, 'pepperi-modalbox', '16rem');
-      });
-    }
-
-    const a: (...args) => Promise<any> = new AsyncFunction('pepperi', 'alert', this.event.Action.Code);
-    await a(this.pepperi, alert);
   }
 
   options = {

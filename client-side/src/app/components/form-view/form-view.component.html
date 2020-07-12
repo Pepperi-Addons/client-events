@@ -24,7 +24,7 @@
                 <pepperi-select [required]="true" [label]="'Event' | translate" [(value)]="event.On.Key" (valueChange)="eventChanged()" [options]="options.eventOptions"></pepperi-select>
             </div>
             <div class="field">
-                <pepperi-select [disabled]="!options.fieldsEnabled" [required]="options.fieldsEnabled" [label]="'Field' | translate" [value]="event.On.Field ? event.On.Field.FieldID : ''" (valueChange)="event.On.Field.FieldID = $event.value" [options]="options.fieldOptions"></pepperi-select>
+                <pepperi-select [disabled]="!options.fieldsEnabled" [required]="options.fieldsEnabled" [label]="'Field' | translate" [value]="event.On.Field ? event.On.Field.FieldID : ''" (valueChange)="event.On.Field.FieldID = $event" [options]="options.fieldOptions"></pepperi-select>
             </div>
             <div class="execution">
                 <pepperi-select [label]="'Execution' | translate" [value]="event.On.Hook" [options]="options.executionOptions"></pepperi-select>
@@ -34,8 +34,7 @@
                     <div class="body-lg pull-left">{{ 'Script' | translate}}</div>
                 </div>
                 <p class="body-sm">Enter your custom logic here</p>
-                <ngx-monaco-editor class="my-code-editor" [options]="editorOptions" [(ngModel)]="event.Action.Code"></ngx-monaco-editor>
-                <button type="button" class="btn pepperi-button mat-button strong color-main md pull-right flip spacing-element" (click)="run()">{{'Test Code' | translate}}</button>
+                <code-editor [(code)]="event.Action.Code"> </code-editor>
             </div>
           </div>          
     </div>

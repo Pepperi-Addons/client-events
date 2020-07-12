@@ -1,5 +1,13 @@
 {
-    "Plugin_Title": "Demo plugin",
-    "Test_Prompt_Title": "Enter the relative API you want to test (eg. /api/foo)",
-    "Submit_Btn_Title": "Test"
+    "Client Events": "Client Events",
+    "Edit_Description": "Define the event details",
+    "Script_Description": "Define the event details",
+    "Submit_Btn_Title": "Enter your custom logic here",
+    "Execution_Before_Title": "Before default logic",
+    "Execution_After_Title": "After default logic",
+    "Execution_Main_Title": "Instead of default logic",
+    "Event_TSAButton_Title": "Button Press",
+    "Event_OnEnter_Title": "On Enter",
+    "Event_CartButton_Title": "Cart Press",
+    "Event_UnitsQuantity_Title": "Units Quantitiy Press"
 }

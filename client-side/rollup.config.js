@@ -96,7 +96,6 @@ export default [{
      '@angular/cdk',
      '@angular/material',
      '@angular/http',
-    //  '@ngx-translate/core',
      '@angular/forms',
      '@angular/cdk/bidi',
      '@angular/cdk/coercion',
@@ -105,10 +104,8 @@ export default [{
      '@angular/cdk/a11y',
      '@angular/cdk/platform',
      '@angular/router',
-     //'pepperi-generic-list-service',
      'pepperi-user-service',
      'pepperi-addon-service',
      'pepperi-ngx-json-viewer',
-      //  'pepperi-environment-variables',
    ],
 }]
