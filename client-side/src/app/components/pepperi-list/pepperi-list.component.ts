@@ -1,26 +1,16 @@
-// @ts-nocheck
-import { Component, ViewEncapsulation, EventEmitter, Inject, SimpleChanges,
-  OnInit, Input,  ComponentRef, ViewChildren, ViewChild, Output, OnDestroy,
-  ChangeDetectorRef, ElementRef } from '@angular/core';
-import { Location } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, OnInit, Input,  ComponentRef, ViewChild, ChangeDetectorRef, ElementRef } from '@angular/core';
 import { PluginService } from './../../plugin.service';
-import { PluginJsonFilter, FooBar } from './../../plugin.model';
-
-// @ts-ignore
-import { Subscription, SubscriptionLike, fromEvent } from 'rxjs';
+import { Subscription, SubscriptionLike } from 'rxjs';
 import { DynamicComponent } from 'ng-dynamic-component';
 
 // @ts-ignore
 import { PepperiListComponent, VIEW_TYPE } from 'pepperi-custom-list';
 // @ts-ignore
-import { ObjectSingleData, PepperiRowData, PepperiFieldData, FIELD_TYPE } from 'pepperi-main-service';
+import { ObjectSingleData, PepperiRowData } from 'pepperi-main-service';
 // @ts-ignore
 import { TopBarComponent, TopBarButton, ICON_POSITION } from 'pepperi-top-bar';
 // @ts-ignore
 import { ListActionsItem } from 'pepperi-list-actions';
-// @ts-ignore
-import { AdvanceSearchComponent } from 'pepperi-advanced-search';
 // @ts-ignore
 import { JsonFilter } from 'pepperi-json-filter';
 // @ts-ignore
@@ -33,6 +23,7 @@ import { __values } from 'tslib';
 
 // @ts-ignore
 import { GridDataView, DataViewFieldTypes } from '@pepperi-addons/papi-sdk'
+import { PluginJsonFilter } from 'src/app/plugin.model';
 
 export interface PepperiListService {
   getDataView(): GridDataView;
@@ -63,19 +54,13 @@ export class PepperiListContComponent implements OnInit {
   pepperiListCont: ElementRef;
   @ViewChild('pepperiListComp', { static: false })
   pepperiListComp: DynamicComponent;
-  @ViewChild('topBarComp', { static: false }) topBarComp: DynamicComponent;
-  @ViewChild('pepperiTextareaGeneralComp', { static: false })
-  pepperiTextareaGeneralComp: DynamicComponent;
-  @ViewChild('pepperiTextareaEmailComp', { static: false })
-  pepperiTextareaEmailComp: DynamicComponent;
+  @ViewChild('topBarComp', { static: false }) 
+  topBarComp: DynamicComponent;
 
   @Input() 
   service: PepperiListService;
 
   list: any[]
-
-  protected paramsSubscription: Subscription;
-  protected locationSubscription: SubscriptionLike;
 
   pepperiListComponent = PepperiListComponent;
   pepperiListInputs;
@@ -84,33 +69,15 @@ export class PepperiListContComponent implements OnInit {
   topBarInputs;
   topBarOutputs;
 
-  pepperiTextareaGeneralComponent = PepperiTextareaComponent;
-  pepperiTextareaGeneralInputs;
-  pepperiTextareaGeneralOutputs;
-
-  pepperiTextareaEmailComponent = PepperiTextareaComponent;
-  pepperiTextareaEmailInputs;
-  pepperiTextareaEmailOutputs;
-
   listActions: Array<ListActionsItem> = null;
   currentList = {ListType: '', ListCustomizationParams: '', ListTabName: '',  ListFilterStr: ''};
 
   totalRows = 0;
-  view: any;
-  installing = false;
   listFilter: PluginJsonFilter;
   jsonDateFilter: JsonFilter;
   searchString = '';
-  translateKeys = [];
-  translations = {};
   updateAvailable = false;
   @Input() apiEndpoint = '';
-  foobar: FooBar;
-  addonsList = [];
-  installedAddonsList = [];
-  isSupportUser = '';
-  enableAddonAutomaticUpgrade = false;
-  currentApiVersion = '';
 
   constructor(
     public pluginService: PluginService,
@@ -285,8 +252,6 @@ export class PepperiListContComponent implements OnInit {
   }
 
   public searchChanged(searchString: string) {
-    //   debugger;
       this.searchString = searchString;
-      
   }
 }

@@ -1,11 +1,9 @@
 import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { PluginService } from 'src/app/plugin.service';
-import { AddonApiService } from 'src/app/addon-api.service';
 import { PepperiListService, PepperiListContComponent } from '../pepperi-list/pepperi-list.component';
 import { EventsService } from 'src/app/events.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { map, flatMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-list-view',
