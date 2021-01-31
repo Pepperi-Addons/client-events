@@ -21,8 +21,6 @@ export class FormViewComponent implements OnInit, OnDestroy {
   loading = true;
   eventUUID: string = ''
   event: Event;
-
-  private routeSubscription: Subscription
   
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -33,56 +31,52 @@ export class FormViewComponent implements OnInit, OnDestroy {
     // private addonService: AddonService,
     private translate: TranslateService,
   ) { 
-    this.routeSubscription = this.activatedRoute.queryParams.subscribe(params => {
-      this.eventUUID = params['uuid'] || '';
+    const params = this.activatedRoute.snapshot.queryParams;
+    this.eventUUID = params['uuid'] || '';
 
-      if (this.eventUUID) {
-        this.eventService.getEvent(this.eventUUID).subscribe(event => {
-          this.event = event;
-          this.updateOptions();
-          this.loading = false;
-          this.cd.detectChanges();
-        })
-      }
-      else {
-        this.loading = false;
-        this.event = {
-          UUID: '',
-          CreationDate: '',
-          ModificationDate: '',
-          Hidden: false,
-          Active: true,
-          Description: '',
-          On: {
-            Key: undefined,
-            Hook: 'Before',
-            Object: {
-              Resource: 'transactions',
-              InternalID: 0,
-              Name: ''
-            },
-            Field: {
-              FieldID: '',
-              Name: ''
-            },
-          },
-          Action: {
-            Type: 'Script',
-            Code: "console.log('hello world!!')"
-          }
-        };
+    if (this.eventUUID) {
+      this.eventService.getEvent(this.eventUUID).subscribe(event => {
+        this.event = event;
         this.updateOptions();
-      }
-    })
+        this.loading = false;
+        this.cd.detectChanges();
+      })
+    }
+    else {
+      this.loading = false;
+      this.event = {
+        UUID: '',
+        CreationDate: '',
+        ModificationDate: '',
+        Hidden: false,
+        Active: true,
+        Description: '',
+        On: {
+          Key: undefined,
+          Hook: 'Before',
+          Object: {
+            Resource: 'transactions',
+            InternalID: 0,
+            Name: ''
+          },
+          Field: {
+            FieldID: '',
+            Name: ''
+          },
+        },
+        Action: {
+          Type: 'Script',
+          Code: "console.log('hello world!!')"
+        }
+      };
+      this.updateOptions();
+    }
   }
 
   ngOnInit(): void {
   }
 
   ngOnDestroy(): void {
-    if (this.routeSubscription) {
-      this.routeSubscription.unsubscribe();
-    }
   }
 
   save() {

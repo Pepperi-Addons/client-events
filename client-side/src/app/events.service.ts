@@ -31,11 +31,11 @@ export class EventsService {
   }
 
   getEvents(): Observable<any[]> {
-    return this.addonService.get(this.addonService.getAddonApiBaseURL() + '/client_events/events').pipe(map(x => x.result));
+    return this.addonService.get(this.addonService.getAddonApiBaseURL() + '/client_events/events');
   }
 
   getEvent(uuid: string): Observable<any> {
-    return this.addonService.get(this.addonService.getAddonApiBaseURL() + `/client_events/events?where=UUID = '${uuid}'`).pipe(map(x => x.result[0]));
+    return this.addonService.get(this.addonService.getAddonApiBaseURL() + `/client_events/events?where=UUID = '${uuid}'`).pipe(map(x => x[0]));
   }
 
   saveEvent(event: any): Observable<any> {

@@ -27,8 +27,9 @@
     "typescript": "~3.8.0"
   },
   "dependencies": {
-    "@pepperi-addons/debug-server": "0.0.21",
+    "@pepperi-addons/debug-server": "0.0.28",
     "@pepperi-addons/papi-sdk": "^1.5.2",
-    "@pepperi-addons/pepperi-filters": "^1.0.4"
+    "@pepperi-addons/pepperi-filters": "^1.0.4",
+    "@rollup/plugin-json": "^4.1.0"
   }
 }

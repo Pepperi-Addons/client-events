@@ -1,4 +1,4 @@
-/publish/api
-/publish/editors
+/publish
 var_sk
 node_modules
+/cpi-side/build

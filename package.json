@@ -6,13 +6,13 @@
   "scripts": {
     "init": "npm install && cd ./server-side && npm install && cd .. && cd ./client-side && npm install && cd ..",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "cd ./server-side && npm run build && cd .. && cd ./client-side && npm run build && cd ..",
+    "build": "cd ./server-side && npm run build && cd .. && cd ./cpi-side && npm run build && cd .. && cd ./client-side && npm run build && cd ..",
     "publish-addon": "npm run build && publish-addon"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@pepperi-addons/scripts": "^1.0.12"
+    "@pepperi-addons/scripts": "^2.0.2"
   }
 }

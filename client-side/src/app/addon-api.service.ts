@@ -8,6 +8,7 @@ import jwt from 'jwt-decode';
 import { HttpClient } from '@angular/common/http';
 import { PapiClient } from '@pepperi-addons/papi-sdk';
 import { tap } from 'rxjs/operators';
+import { CPI_NODE_ADDON_UUID } from './shared/entities';
 
 
 @Injectable({
@@ -34,13 +35,10 @@ export class AddonApiService
         private userService: UserService,
         private httpClient: HttpClient
     ) {
-        this.route.params.subscribe(params => {
-            this.addonUUID = params.pluginID;
-        });
-
-        this.route.queryParams.subscribe(params => {
-            this.isInDevMode = params["dev"] || false;
-        });
+        const routeParams = this.route.snapshot.params;
+        const params = this.route.snapshot.queryParams;
+        this.addonUUID = routeParams.pluginID;
+        this.isInDevMode = params["dev"] || false;
 
         const accessToken = this.userService.getUserToken();
         this.parsedToken = jwt(accessToken);
@@ -53,6 +51,18 @@ export class AddonApiService
 
     getAddonStaticFolderURL(): string {
         return this.userService.getAddonStaticFolder();
+    }
+
+    async getCPINodeStaticFolderURL() {
+        var res = '';
+
+        var cpiAddon = await this.papiClient.addons.installedAddons.addonUUID(CPI_NODE_ADDON_UUID).get();
+
+        if (cpiAddon) {
+            res = cpiAddon['PublicBaseURL'];
+        }
+
+        return res;
     }
 
     get(url: string) {

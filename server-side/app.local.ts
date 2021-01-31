@@ -9,11 +9,13 @@ const server = new DebugServer({
 });
 
 // serve the plugin file locally
-server.addStaticFolder(`/assets/plugins/${config.AddonUUID}/${config.AddonVersion}`, process.cwd() +  '/../publish/editors');
+server.addStaticFolder(`/assets/plugins/${config.AddonUUID}/${config.AddonVersion}`, process.cwd() +  '/../publish');
+
+server.addStaticFolder(`/`, process.cwd() +  '/../publish');
 
 // serve the plugin assets locally
-server.addStaticFolder(`/Addon/Public/${config.AddonUUID}/${config.AddonVersion}`, process.cwd() +  '/../publish/assets');
-server.addStaticFolder(`/assets/plugins/${config.AddonUUID}/${config.AddonVersion}`, process.cwd() +  '/../publish/assets');
+server.addStaticFolder(`/Addon/Public/${config.AddonUUID}/${config.AddonVersion}`, process.cwd() +  '/../publish');
+server.addStaticFolder(`/`, process.cwd() +  '/../publish/assets');
 
 server.start();
 

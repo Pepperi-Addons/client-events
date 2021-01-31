@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import ClientApi from '@pepperi-addons/client-api'
 import { AddonApiService } from 'src/app/addon-api.service';
 import { NGX_MONACO_EDITOR_CONFIG, NgxMonacoEditorConfig } from 'ngx-monaco-editor';
@@ -16,7 +16,7 @@ const AsyncFunction = eval('Object.getPrototypeOf(async function(){}).constructo
 
 export function moncaConfigFactory(addonApiService: AddonApiService): NgxMonacoEditorConfig {
   return {
-    baseUrl: EnvVariables.AssetsDomain + sessionStorage.getItem('webappDirectory') +'/assets', // configure base path for monaco editor
+    baseUrl: addonApiService.getAddonStaticFolderURL().slice(0, -1), // configure base path for monaco editor
     onMonacoLoad: async () => {
   
       window.monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
@@ -25,7 +25,11 @@ export function moncaConfigFactory(addonApiService: AddonApiService): NgxMonacoE
       })
   
       window.monaco.languages.typescript.javascriptDefaults.addExtraLib(
-        await fetch(addonApiService.getAddonStaticFolderURL() + 'types.d.ts').then(res => res.text())
+        await fetch((await addonApiService.getCPINodeStaticFolderURL()) + 'globals.d.ts').then(res => res.text())
+      )
+
+      window.monaco.languages.typescript.javascriptDefaults.addExtraLib(
+        'declare const pepperi: typeof ClientApi'
       )
     }
   }
@@ -51,8 +55,10 @@ export class CodeEditorComponent implements OnInit {
   });
 
   @Input()
+  value: string
+
   @Output()
-  code: string
+  valueChange = new EventEmitter<string>();
 
   editorOptions = {
     theme: "vs-light",
@@ -69,27 +75,12 @@ export class CodeEditorComponent implements OnInit {
   }
 
   async run() {
-    let alert = async (data: AlertData): Promise<{ key: string }> => {
-      return new Promise((resolve, reject) => {
-        const buttons = data.actions.map(action => {
-          return {
-            title: action.title,
-            callback: () => {
-              resolve({
-                key: action.key
-              })
-            },
-            className: 'pepperi-button md',
-          }
-        })
-        const dialogData = new DialogData(data.title, data.message, DialogDataType.TextArea, buttons);
-  
-        this.addonService.openDialog(dialogData);
-      });
-    }
+    const a: (...args) => Promise<any> = new AsyncFunction('pepperi', this.value);
+    await a(this.pepperi);
+  }
 
-    const a: (...args) => Promise<any> = new AsyncFunction('pepperi', 'alert', this.code);
-    await a(this.pepperi, alert);
+  onCodeChange() {
+    this.valueChange.emit(this.value);
   }
 
 }

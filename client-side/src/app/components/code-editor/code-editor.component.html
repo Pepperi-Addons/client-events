@@ -1,4 +1,4 @@
 <div class="content">
-    <ngx-monaco-editor class="my-code-editor" [options]="editorOptions" [(ngModel)]="code"></ngx-monaco-editor>
+    <ngx-monaco-editor class="my-code-editor" [options]="editorOptions" [(ngModel)]="value" (ngModelChange)="onCodeChange()"></ngx-monaco-editor>
     <button type="button" class="btn pepperi-button mat-button strong color-main md pull-right flip spacing-element" (click)="run()">{{'Test Code' | translate}}</button>
 </div>

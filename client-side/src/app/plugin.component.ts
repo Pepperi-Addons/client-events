@@ -36,16 +36,17 @@ export class PluginComponent implements OnInit {
     userLang = translate.getBrowserLang().split('-')[0]; // use navigator lang if available
     translate.use(userLang);
 
-    this.routeParams.queryParams.subscribe(params => {
-      this.view = params['view'] || 'list';
-    })
+    const params = this.routeParams.snapshot.queryParams;
+    this.view = params['view'] || 'list';
   }
 
 
   ngOnInit() {
+    window['define'].amd = null;
   }
 
   ngOnDestroy() {
+    window['define'].amd = {};
   }
   
 }

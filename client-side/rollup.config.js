@@ -20,7 +20,7 @@ import Utils from 'rollup-plugin-app-utils';
 export default [{
    input: 'src/main.ts',
    output: {
-     file: '../publish/editors/editor.plugin.bundle.js',
+     file: '../publish/editor.plugin.bundle.js',
      format: 'umd',
      name: 'editor',
      globals: {

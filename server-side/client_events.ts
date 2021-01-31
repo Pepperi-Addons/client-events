@@ -8,7 +8,7 @@ export async function events(client: Client, request: Request) {
         return service.upsert(request.body);
     }
     else if (request.method == 'GET') {
-        return { result: await service.find(request.query) };
+        return await service.find(request.query);
     }
 };
 
