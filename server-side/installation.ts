@@ -8,18 +8,10 @@ exports.install = async (client: Client, request: Request) => {
         baseURL: client.BaseURL,
         token: client.OAuthAccessToken,
     });
-    
-    const obj = await papiClient.addons.api.uuid(CPI_NODE_ADDON_UUID).file('cpi_node').func('configurations').post({}, {
-        AddonUUID: config.AddonUUID,
-        FileName: 'client-events-app.js',
-        Data: {}
-    });
-
-    console.log('Configuration created: ', obj)
 
     await papiClient.addons.api.uuid(CPI_NODE_ADDON_UUID).file('cpi_node').func('files').post({},{
         AddonUUID: config.AddonUUID,
-        FileName: 'client-events-app.js',
+        Files: ['client-events-app.js'],
         Version: request.body.ToVersion
     })
 
@@ -36,8 +28,8 @@ exports.upgrade = async (client: Client, request: Request) => {
     });
 
     await papiClient.addons.api.uuid(CPI_NODE_ADDON_UUID).file('cpi_node').func('files').post({},{
-        AddonUUID: client.AddonUUID,
-        FileName: 'client-events-app.js',
+        AddonUUID: config.AddonUUID,
+        Files: ['client-events-app.js'],
         Version: request.body.ToVersion
     })
     return {success:true,resultObject:{}}

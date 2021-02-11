@@ -1,6 +1,6 @@
 {
   "AddonUUID": "02b186b2-4b43-4765-962c-9e02231b5514",
-  "AddonVersion": "0.0.37",
+  "AddonVersion": "0.0.38",
   "DebugPort": 4400,
   "PapiBaseUrl": "https://papi.sandbox.pepperi.com/v1.0",
   "WebappBaseUrl": "https://app.sandbox.pepperi.com",
